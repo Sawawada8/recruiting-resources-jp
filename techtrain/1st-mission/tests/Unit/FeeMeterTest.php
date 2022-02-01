@@ -30,4 +30,16 @@ class FeeMeterTest extends TestCase {
         );
         $this->assertSame($this->feeMeter->getFee()->getValue(), 410 + 1000*80);
     }
+
+    public function testSlowFee()
+    {
+        $this->feeMeter->calcFee(
+            new Time('13:00:00.000'),
+            new Time('14:00:00.000'),
+            new DistanceDomainService(new M(0)),
+            // 3600 s / 90 = 40 // 40 * 80 3200
+            new DistanceDomainService(new M(1000 + 1052)) // 3200 + 410
+        );
+        $this->assertSame($this->feeMeter->getFee()->getValue(), 410 + 3600/90*80);
+    }
 }

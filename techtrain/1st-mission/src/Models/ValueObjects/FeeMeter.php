@@ -34,6 +34,10 @@ class FeeMeter {
     }
 
     /**
+     * @param Time
+     * @param Time
+     * @param DistanceDomainService
+     * @param DistanceDomainService
      * @return void
      */
     public function calcFee(
@@ -60,16 +64,16 @@ class FeeMeter {
         if ($DPerTime->getKMPerTime() < self::SLOW_CONDITION) {
             // 低速料金
             // 時間いっぱい指定のりょうきんでおｋ
-            $runTime = new Time($time2->getTime() - $time->getTime());
-            $runTimeSecond = $runTime->getSecond();
-            $a = (int)$runTimeSecond / 90;
+            $runTimeSecond = $time2->getTime() - $time->getTime();
 
-            $this->fee->increment($a * self::SLOW_ADD_FEE);
+            $incrementCount = (int)floor($runTimeSecond / 90);
+
+            $this->fee->increment($incrementCount * self::SLOW_ADD_FEE);
             return;
         }
 
-        $aa = (int)floor($runDistanceRMFirstRide->getM()->getValue() / 237);
-        $this->fee->increment($aa * 80);
+        $incrementCount = (int)floor($runDistanceRMFirstRide->getM()->getValue() / 237);
+        $this->fee->increment($incrementCount * 80);
     }
 
     /**
