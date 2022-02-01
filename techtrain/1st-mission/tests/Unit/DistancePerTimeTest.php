@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use Src\Models\ValueObjects\DistancePerTime;
 use Src\Models\ValueObjects\Time;
-use Src\Models\ValueObjects\DistanceDomainService;
+use Src\Models\ValueObjects\Distance;
 use Src\Models\ValueObjects\M;
 
 class DistancePerTimeTest extends TestCase {
@@ -11,8 +11,8 @@ class DistancePerTimeTest extends TestCase {
     {
         $time = new Time('10:00:00.000');
         $time2 = new Time('11:00:00.000');
-        $distance = new DistanceDomainService(new M(0));
-        $distance2 = new DistanceDomainService(new M(1000));
+        $distance = new Distance(new M(0));
+        $distance2 = new Distance(new M(1000));
 
         $dPerTime = new DistancePerTime($time, $time2, $distance, $distance2);
         $this->assertSame(

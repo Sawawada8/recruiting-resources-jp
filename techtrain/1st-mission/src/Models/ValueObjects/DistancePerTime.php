@@ -7,7 +7,7 @@ class DistancePerTime {
     private $KMPerMinute;
     private $KMPerSeconds;
 
-    public function __construct(Time $time,Time $time2, DistanceDomainService $distance, DistanceDomainService $distance2)
+    public function __construct(Time $time,Time $time2, Distance $distance, Distance $distance2)
     {
         $this->KMPerTime =
             ($distance2->getKM()->getValue() - $distance->getKM()->getValue())

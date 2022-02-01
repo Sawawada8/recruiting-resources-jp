@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 use Src\Models\ValueObjects\KM;
 use Src\Models\ValueObjects\M;
 use Src\Models\ValueObjects\CM;
-use Src\Models\ValueObjects\DistanceDomainService;
+use Src\Models\ValueObjects\Distance;
 
 class DistanceTest extends TestCase {
     public function testKMTodo()
@@ -23,15 +23,15 @@ class DistanceTest extends TestCase {
         $this->assertSame($cm->getValue(),1);
     }
 
-    public function testDistanceDomainService()
+    public function testDistance()
     {
-        $distance = new DistanceDomainService(new KM(1));
+        $distance = new Distance(new KM(1));
 
         $this->assertSame($distance->getKM()->getValue(),1);
         $this->assertSame($distance->getM()->getValue(),1000);
         $this->assertSame($distance->getCM()->getValue(),100000);
 
-        $distance = new DistanceDomainService(new M(1));
+        $distance = new Distance(new M(1));
 
         $this->assertSame($distance->getKM()->getValue(),0.001);
         $this->assertSame($distance->getM()->getValue(),1);

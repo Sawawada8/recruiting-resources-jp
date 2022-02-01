@@ -4,7 +4,7 @@ namespace Src\Models\ValueObjects;
 
 use Exception;
 
-class DistanceDomainService {
+class Distance {
     /** @var KM */
     private $km;
 
@@ -17,13 +17,13 @@ class DistanceDomainService {
     public function __construct(IDistance $distance)
     {
         $distance_class = get_class($distance);
-        if (!in_array($distance_class, [
-            'Src\Models\ValueObjects\KM',
-            'Src\Models\ValueObjects\M',
-            'Src\Models\ValueObjects\CM',
-        ])) {
-            throw new Exception('KM, M, CM のいずれかのオブジェクトを設定してくだいさい.');
-        }
+        // if (!in_array($distance_class, [
+        //     'Src\Models\ValueObjects\KM',
+        //     'Src\Models\ValueObjects\M',
+        //     'Src\Models\ValueObjects\CM',
+        // ])) {
+        //     throw new Exception('KM, M, CM のいずれかのオブジェクトを設定してくだいさい.');
+        // }
         switch($distance_class) {
             case 'Src\Models\ValueObjects\KM':
                 $this->km = $distance;

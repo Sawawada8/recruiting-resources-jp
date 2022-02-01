@@ -8,13 +8,13 @@ class FeeMeter {
     /** @var Fee */
     private $fee;
 
-    /** @var DistanceDomainService */
+    /** @var Distance */
     private $firstRideLimit;
 
     /** @var Time */
     private $time;
 
-    /** @var DistanceDomainService */
+    /** @var Distance */
     private $distance;
 
     const FIRST_RIDE_DISTANCE = 1.052;
@@ -30,23 +30,24 @@ class FeeMeter {
     public function __construct()
     {
         $this->fee = new Fee(self::FIRST_RIDE_FEE);
-        $this->firstRideLimit = new DistanceDomainService(new KM(self::FIRST_RIDE_DISTANCE));
+        $this->firstRideLimit = new Distance(new KM(self::FIRST_RIDE_DISTANCE));
     }
 
     /**
+     * 時間、走行距離から料金の加算を行う
      * @param Time
      * @param Time
-     * @param DistanceDomainService
-     * @param DistanceDomainService
+     * @param Distance
+     * @param Distance
      * @return void
      */
     public function calcFee(
         Time $time,
         Time $time2,
-        DistanceDomainService $distance,
-        DistanceDomainService $distance2)
+        Distance $distance,
+        Distance $distance2)
     {
-        $runDistance = new DistanceDomainService(
+        $runDistance = new Distance(
             new M(
                 $distance2->getM()->getValue()
                 -
@@ -54,8 +55,8 @@ class FeeMeter {
             )
         );
         $runDistanceRMFirstRide = $this->calcFirstRide($runDistance);
-
         if ($runDistanceRMFirstRide->getKM()->getValue() == 0) {
+            // 初乗り距離の範囲で収まった
             return;
         }
 
@@ -77,14 +78,14 @@ class FeeMeter {
     }
 
     /**
-     * @return DistanceDomainService
+     * @return Distance
      */
     private function calcFirstRide($runDistance)
     {
         if ($this->firstRideLimit->getKM()->getValue() > $runDistance->getKM()->getValue()) {
-            // 初乗り範囲
+            // 走行距離が初乗り範囲内
             $this->firstRideLimit =
-                new DistanceDomainService(
+                new Distance(
                     new KM(
                         $this->firstRideLimit->getKM()->getValue() -
                         $runDistance->getKM()->getValue()
@@ -92,11 +93,11 @@ class FeeMeter {
                 );
 
             // 走行距離はすべて消費された
-            return new DistanceDomainService(new KM(0));
+            return new Distance(new KM(0));
         }
 
         $runDistance =
-            new DistanceDomainService(
+            new Distance(
                 new KM(
                     $runDistance->getKM()->getValue()
                     -
