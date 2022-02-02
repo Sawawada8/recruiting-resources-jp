@@ -3,7 +3,17 @@
 namespace Src;
 
 use Src\Applications\FeeMeterService;
+use Src\Models\ValueObjects\FeeMeter;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-new FeeMeterService();
+
+while ($line = fgets(STDIN)) {
+    // 配列を生成する
+    $input_datas[] = trim($line);
+}
+
+
+$feeMeterService = new FeeMeterService(new FeeMeter());
+
+echo $feeMeterService->calcTotalFee($input_datas);
