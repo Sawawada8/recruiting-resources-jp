@@ -21,11 +21,13 @@ class FeeMeter {
     const FIRST_RIDE_FEE = 410;
 
     const NORMAL_ADD_FEE = 80;
-    const NORMAL_ADD_LIMIT = 237;
+    const NORMAL_ADD_DISTANCE = 237;
 
     const SLOW_CONDITION = 10;
     const SLOW_ADD_FEE = 80;
     const SLOW_ADD_TIME = '00:01:30';
+
+    const NIGHT_MAGNIFICATION = 1.25;
 
     public function __construct()
     {
@@ -54,6 +56,12 @@ class FeeMeter {
                 $distance->getM()->getValue()
             )
         );
+        if ($time->getIsNight() || $time2->getIsNight()) {
+            $runDistance = new Distance(
+                new M($runDistance->getM()->getValue() * self::NIGHT_MAGNIFICATION)
+            );
+        }
+
         $runDistanceRMFirstRide = $this->calcFirstRide($runDistance);
         if ($runDistanceRMFirstRide->getKM()->getValue() == 0) {
             // 初乗り距離の範囲で収まった
@@ -67,14 +75,18 @@ class FeeMeter {
             // 時間いっぱい指定のりょうきんでおｋ
             $runTimeSecond = $time2->getTime() - $time->getTime();
 
+            if ($time->getIsNight() || $time2->getIsNight()) {
+                $runTimeSecond *= self::NIGHT_MAGNIFICATION;
+            }
+
             $incrementCount = (int)floor($runTimeSecond / 90);
 
             $this->fee->increment($incrementCount * self::SLOW_ADD_FEE);
             return;
         }
 
-        $incrementCount = (int)floor($runDistanceRMFirstRide->getM()->getValue() / 237);
-        $this->fee->increment($incrementCount * 80);
+        $incrementCount = (int)ceil($runDistanceRMFirstRide->getM()->getValue() / self::NORMAL_ADD_DISTANCE);
+        $this->fee->increment($incrementCount * self::NORMAL_ADD_FEE);
     }
 
     /**
@@ -110,12 +122,5 @@ class FeeMeter {
     public function getFee()
     {
         return $this->fee;
-    }
-}
-
-class FeeMeterApplicationService {
-    public function __construct()
-    {
-        # code...
     }
 }
