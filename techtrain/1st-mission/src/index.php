@@ -3,7 +3,7 @@
 namespace Src;
 
 use Src\Applications\FeeMeterService;
-use Src\Models\ValueObjects\FeeMeter;
+use Src\Entities\FeeMeter;
 
 require __DIR__ . '/../vendor/autoload.php';
 

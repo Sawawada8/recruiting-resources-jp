@@ -3,10 +3,10 @@
 namespace Src\Applications;
 
 use Exception;
-use Src\Models\ValueObjects\Distance;
-use Src\Models\ValueObjects\M;
-use Src\Models\ValueObjects\Time;
-use Src\Models\ValueObjects\FeeMeter;
+use Src\ValueObjects\Distance;
+use Src\ValueObjects\M;
+use Src\ValueObjects\Time;
+use Src\Entities\FeeMeter;
 
 class FeeMeterService {
     /** @var FeeMeter */
@@ -18,6 +18,7 @@ class FeeMeterService {
     }
 
     /**
+     * 入力データ配列から料金計算を行う
      * @param  array
      * @return int
      */
@@ -31,6 +32,7 @@ class FeeMeterService {
             if ($key === 0) {
                 continue;
             }
+
             $data1 = explode(' ', $input_datas[$key-1]);
             $time1 = $data1[0];
             $distance1 = $data1[1];

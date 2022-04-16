@@ -1,6 +1,14 @@
 <?php
 
-namespace Src\Models\ValueObjects;
+namespace Src\Entities;
+
+use Src\ValueObjects\Fee;
+use Src\ValueObjects\Distance;
+use Src\ValueObjects\CM;
+use Src\ValueObjects\M;
+use Src\ValueObjects\KM;
+use Src\ValueObjects\Time;
+use Src\ValueObjects\DistancePerTime;
 
 /**
  */
@@ -72,27 +80,21 @@ class FeeMeter {
 
         if ($DPerTime->getKMPerTime() < self::SLOW_CONDITION) {
             // 低速料金
-            // 時間いっぱい指定のりょうきんでおｋ
-            $runTimeSecond = $time2->getTime() - $time->getTime();
-
-            if ($time->getIsNight() || $time2->getIsNight()) {
-                $runTimeSecond *= self::NIGHT_MAGNIFICATION;
-            }
-
-            $incrementCount = (int)floor($runTimeSecond / 90);
-
-            $this->fee->increment($incrementCount * self::SLOW_ADD_FEE);
+            $this->calcSlowFee($time, $time2);
             return;
         }
 
-        $incrementCount = (int)ceil($runDistanceRMFirstRide->getM()->getValue() / self::NORMAL_ADD_DISTANCE);
+        $incrementCount = (int)ceil(
+            $runDistanceRMFirstRide->getM()->getValue() /
+            self::NORMAL_ADD_DISTANCE);
         $this->fee->increment($incrementCount * self::NORMAL_ADD_FEE);
     }
 
     /**
+     * @param  Distance
      * @return Distance
      */
-    private function calcFirstRide($runDistance)
+    private function calcFirstRide(Distance $runDistance)
     {
         if ($this->firstRideLimit->getKM()->getValue() > $runDistance->getKM()->getValue()) {
             // 走行距離が初乗り範囲内
@@ -117,6 +119,25 @@ class FeeMeter {
                 )
             );
         return $runDistance;
+    }
+
+    /**
+     * 低速料金の計算
+     * @param Time $time
+     * @param Time $time2
+     * @return void
+     */
+    private function calcSlowFee(Time $time, Time $time2)
+    {
+        $runTimeSecond = $time2->getTime() - $time->getTime();
+
+        if ($time->getIsNight() || $time2->getIsNight()) {
+            $runTimeSecond *= self::NIGHT_MAGNIFICATION;
+        }
+
+        $incrementCount = (int)floor($runTimeSecond / 90);
+
+        $this->fee->increment($incrementCount * self::SLOW_ADD_FEE);
     }
 
     public function getFee()

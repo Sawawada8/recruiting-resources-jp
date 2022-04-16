@@ -1,10 +1,10 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Src\Models\ValueObjects\KM;
-use Src\Models\ValueObjects\M;
-use Src\Models\ValueObjects\CM;
-use Src\Models\ValueObjects\Distance;
+use Src\ValueObjects\KM;
+use Src\ValueObjects\M;
+use Src\ValueObjects\CM;
+use Src\ValueObjects\Distance;
 
 class DistanceTest extends TestCase {
     public function testKMTodo()

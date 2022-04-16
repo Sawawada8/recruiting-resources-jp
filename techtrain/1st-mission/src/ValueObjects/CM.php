@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Models\ValueObjects;
+namespace Src\ValueObjects;
 
 class CM implements IDistance {
     /** @var int */
