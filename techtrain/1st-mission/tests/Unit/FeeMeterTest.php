@@ -5,6 +5,7 @@ use Src\Entities\FeeMeter;
 use Src\ValueObjects\Time;
 use Src\ValueObjects\Distance;
 use Src\ValueObjects\M;
+use Src\ValueObjects\KM;
 
 /**
  * 料金メーターオブジェクトテスト
@@ -17,9 +18,31 @@ class FeeMeterTest extends TestCase {
         $this->feeMeter = new FeeMeter();
     }
 
-    public function test_初期化時の初乗り料金のテスト()
+    public function test_初乗り距離範囲内の料金テスト()
     {
+        $this->feeMeter->calcFee(
+            new Time('13:00:00.000'),
+            new Time('13:00:10.000'),
+            new Distance(new M(0)),
+            new Distance(new KM(1.052))
+        );
+
         $this->assertSame($this->feeMeter->getFee()->getValue(), 410);
+    }
+
+    public function test_初乗り距離＋1mの料金のテスト()
+    {
+        $this->feeMeter->calcFee(
+            new Time('13:00:00.000'),
+            new Time('13:00:10.000'),
+            new Distance(new M(0)),
+            new Distance(new KM(1.053))
+        );
+
+        // 初乗り料金 ＋ 80円加算
+        $this->assertSame(
+            $this->feeMeter->getFee()->getValue(), 410 + 80
+        );
     }
 
     public function test_初乗り料金＋所定距離のテスト()
@@ -45,11 +68,11 @@ class FeeMeterTest extends TestCase {
             new Time('13:00:00.000'),
             new Time('14:00:00.000'),
             new Distance(new M(0)),
-            // 3600 s / 90 = 40 // 40 * 80 3200
-            // 初乗り距離 + 1km
-            new Distance(new M(1000 + 1052)) // 3200 + 410
+            // 低速 3600 s / 90 = 40 // 40 * 80 3200
+            // 初乗り距離 + 1km (410 + ceil(1000 / 237) * 80 = (410 + 5 * 80))
+            new Distance(new M(1000 + 1052)) // 3200 + 410 + 400
         );
-        $this->assertSame($this->feeMeter->getFee()->getValue(), 410 + 3600/90*80);
+        $this->assertSame($this->feeMeter->getFee()->getValue(), 410 + 400 + 3600/90*80);
     }
 
     public function test_深夜料金に対するテスト()
@@ -72,6 +95,7 @@ class FeeMeterTest extends TestCase {
             new Distance(new M(0)),
             new Distance(new M(2000))
         );
-        $this->assertSame($this->feeMeter->getFee()->getValue(), (int)(410 + 3600/90*80 * 1.25));
+        // ceil ((2500-1052 = 1448) / 237)  * 80 == 7 * 80
+        $this->assertSame($this->feeMeter->getFee()->getValue(), (int)( 410 +  560 + (3600/90*80 * 1.25)));
     }
 }

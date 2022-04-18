@@ -57,35 +57,43 @@ class FeeMeter {
         Distance $distance,
         Distance $distance2)
     {
+        // 低速料金時は、加算
+        $DPerTime = new DistancePerTime($time, $time2, $distance, $distance2);
+        if ($DPerTime->getKMPerTime() < self::SLOW_CONDITION) {
+            $this->calcSlowFee($time, $time2);
+        }
+
+        // 走行距離
         $runDistance = new Distance(
             new M(
                 $distance2->getM()->getValue()
-                -
-                $distance->getM()->getValue()
             )
         );
+
         if ($time->getIsNight() || $time2->getIsNight()) {
+            // 深夜なので、距離に深夜倍率を掛ける
             $runDistance = new Distance(
                 new M($runDistance->getM()->getValue() * self::NIGHT_MAGNIFICATION)
             );
         }
 
-        $runDistanceRMFirstRide = $this->calcFirstRide($runDistance);
-        if ($runDistanceRMFirstRide->getKM()->getValue() == 0) {
+        // 初乗り距離から走行距離を消費していく
+        $this->firstRideLimit = new Distance(
+            new M(
+                $this->firstRideLimit->getM()->getValue()
+                - $runDistance->getM()->getValue()
+            )
+        );
+        if ($this->firstRideLimit->getKM()->getValue() > 0) {
             // 初乗り距離の範囲で収まった
             return;
         }
 
-        $DPerTime = new DistancePerTime($time, $time2, $distance, $distance2);
 
-        if ($DPerTime->getKMPerTime() < self::SLOW_CONDITION) {
-            // 低速料金
-            $this->calcSlowFee($time, $time2);
-            return;
-        }
+        $runDistanceRMFirstRide = $this->firstRideLimit->getM()->getValue() * -1;
 
         $incrementCount = (int)ceil(
-            $runDistanceRMFirstRide->getM()->getValue() /
+            $runDistanceRMFirstRide /
             self::NORMAL_ADD_DISTANCE);
         $this->fee->increment($incrementCount * self::NORMAL_ADD_FEE);
     }
