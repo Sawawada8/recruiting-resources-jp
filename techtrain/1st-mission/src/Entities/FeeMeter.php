@@ -89,44 +89,13 @@ class FeeMeter {
             return;
         }
 
-
+        // 初乗り距離がすべて消費されてマイナスとっているので、-1を掛けてひっくり返す。
         $runDistanceRMFirstRide = $this->firstRideLimit->getM()->getValue() * -1;
 
         $incrementCount = (int)ceil(
             $runDistanceRMFirstRide /
             self::NORMAL_ADD_DISTANCE);
         $this->fee->increment($incrementCount * self::NORMAL_ADD_FEE);
-    }
-
-    /**
-     * @param  Distance
-     * @return Distance
-     */
-    private function calcFirstRide(Distance $runDistance)
-    {
-        if ($this->firstRideLimit->getKM()->getValue() > $runDistance->getKM()->getValue()) {
-            // 走行距離が初乗り範囲内
-            $this->firstRideLimit =
-                new Distance(
-                    new KM(
-                        $this->firstRideLimit->getKM()->getValue() -
-                        $runDistance->getKM()->getValue()
-                    )
-                );
-
-            // 走行距離はすべて消費された
-            return new Distance(new KM(0));
-        }
-
-        $runDistance =
-            new Distance(
-                new KM(
-                    $runDistance->getKM()->getValue()
-                    -
-                    $this->firstRideLimit->getKM()->getValue()
-                )
-            );
-        return $runDistance;
     }
 
     /**
