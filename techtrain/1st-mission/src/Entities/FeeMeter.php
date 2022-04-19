@@ -10,8 +10,6 @@ use Src\ValueObjects\KM;
 use Src\ValueObjects\Time;
 use Src\ValueObjects\DistancePerTime;
 
-/**
- */
 class FeeMeter {
     /** @var Fee */
     private $fee;
@@ -64,14 +62,9 @@ class FeeMeter {
         }
 
         // 走行距離
-        $runDistance = new Distance(
-            new M(
-                $distance2->getM()->getValue()
-            )
-        );
-
+        $runDistance = $distance2;
         if ($time->getIsNight() || $time2->getIsNight()) {
-            // 深夜なので、距離に深夜倍率を掛ける
+            // 深夜の場合は、距離に深夜倍率を掛ける
             $runDistance = new Distance(
                 new M($runDistance->getM()->getValue() * self::NIGHT_MAGNIFICATION)
             );
@@ -109,6 +102,7 @@ class FeeMeter {
         $runTimeSecond = $time2->getTime() - $time->getTime();
 
         if ($time->getIsNight() || $time2->getIsNight()) {
+            // 低速時の深夜は、時間に対して倍率を掛ける
             $runTimeSecond *= self::NIGHT_MAGNIFICATION;
         }
 
